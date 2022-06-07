@@ -56,3 +56,16 @@ app.use(methodOverride("_method")); // override for put and delete requests from
 app.use(express.urlencoded({ extended: true })); // parse urlencoded request bodies
 app.use(express.static("public")); // serve files from public statically
 
+////////////////////////////////////////////
+// Routes
+////////////////////////////////////////////
+app.get("/", (req, res) => {
+    res.send("your server is running... better catch it.");
+  });
+  
+//////////////////////////////////////////////
+// Server Listener
+//////////////////////////////////////////////
+const PORT = process.env.PORT;
+app.listen(PORT, () => console.log(`Now Listening on port ${PORT}`));
+
