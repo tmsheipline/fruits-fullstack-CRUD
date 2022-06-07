@@ -92,14 +92,19 @@ app.get("/fruits", async (req, res) => {
   res.render("fruits/index.liquid", { fruits });
 });
 
-//CREATE ROUTE / POST
-app.post("/fruits", (req, res) => {
-    // check if the readyToEat property should be true or false
-    req.body.readyToEat = req.body.readyToEat === "on" ? true : false;
-    // create the new fruit
-    Fruit.create(req.body)
-      .then((fruits) => {
-        // redirect user to index page if successfully created item
+//NEW ROUTE
+app.get("/fruits/new", (req, res) => {
+  res.render("fruits/new.liquid");
+});
+
+//DELETE ROUTE
+app.delete("/fruits/:id", (req, res) => {
+    // get the id from params
+    const id = req.params.id;
+    // delete the fruit
+    Fruit.findByIdAndRemove(id)
+      .then((fruit) => {
+        // redirect to main page after deleting
         res.redirect("/fruits");
       })
       // send error as json
@@ -109,10 +114,57 @@ app.post("/fruits", (req, res) => {
       });
   });
   
+  //UPDATE ROUTE - PUT
+  app.put("/fruits/:id", (req, res) => {
+      // get the id from params
+      const id = req.params.id;
+      // check if the readyToEat property should be true or false
+      req.body.readyToEat = req.body.readyToEat === "on" ? true : false;
+      // update the fruit
+      Fruit.findByIdAndUpdate(id, req.body, { new: true })
+        .then((fruit) => {
+          // redirect to main page after updating
+          res.redirect("/fruits");
+        })
+        // send error as json
+        .catch((error) => {
+          console.log(error);
+          res.json({ error });
+        });
+    });
+  
+//CREATE ROUTE - POST
+app.post("/fruits", (req, res) => {
+  // check if the readyToEat property should be true or false
+  req.body.readyToEat = req.body.readyToEat === "on" ? true : false;
+  // create the new fruit
+  Fruit.create(req.body)
+    .then((fruits) => {
+      // redirect user to index page if successfully created item
+      res.redirect("/fruits");
+    })
+    // send error as json
+    .catch((error) => {
+      console.log(error);
+      res.json({ error });
+    });
+});
 
-//NEW ROUTE
-app.get("/fruits/new", (req, res) => {
-    res.render("fruits/new.liquid");
+//EDIT ROUTE
+app.get("/fruits/:id/edit", (req, res) => {
+    // get the id from params
+    const id = req.params.id;
+    // get the fruit from the database
+    Fruit.findById(id)
+      .then((fruit) => {
+        // render edit page and send fruit data
+        res.render("fruits/edit.liquid", { fruit });
+      })
+      // send error as json
+      .catch((error) => {
+        console.log(error);
+        res.json({ error });
+      });
   });
   
 
@@ -132,8 +184,6 @@ app.get("/fruits/:id", (req, res) => {
       res.json({ error });
     });
 });
-
-
 
 //////////////////////////////////////////////
 // Server Listener
